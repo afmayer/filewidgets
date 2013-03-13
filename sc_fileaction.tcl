@@ -20,31 +20,57 @@ proc gui::Create {root} {
     
     frame $base.f.a
     
-    frame $base.f.a.f1 -borderwidth 3 -relief solid
-    label $base.f.a.f1.testlabel -text "TEST1"
+    frame $base.f.a.f1 \
+        -borderwidth 3 \
+        -relief solid
+    label $base.f.a.f1.testlabel \
+        -text "TEST1"
     
-    frame $base.f.a.f2 -borderwidth 3 -relief solid
-    label $base.f.a.f2.testlabel -text "TEST2"
+    frame $base.f.a.f2 -borderwidth 3 \
+        -relief solid
+    label $base.f.a.f2.testlabel \
+        -text "TEST2"
     
-    button $base.f.btn1 -text OK
-    button $base.f.btn2 -text Cancel -command [namespace code [list CancelBtnPressed]]
+    button $base.f.btn1 \
+        -text OK
+    button $base.f.btn2 \
+        -text Cancel \
+        -command [namespace code [list CancelBtnPressed]]
     
     # layout
-    grid $base.f -column 0 -row 0 -sticky nwes
-    grid rowconfigure $root $base.f -weight 1
-    grid columnconfigure $root $base.f -weight 1
+    grid $base.f \
+        -column 0 \
+        -row 0 \
+        -sticky nwes
+    grid rowconfigure $root $base.f \
+        -weight 1
+    grid columnconfigure $root $base.f \
+        -weight 1
     
-    grid $base.f.a -column 0 -row 0 -columnspan 2 -rowspan 1 -sticky nwes
-    grid rowconfigure $base.f $base.f.a -weight 1
-    grid columnconfigure $base.f $base.f.a -weight 1
+    grid $base.f.a \
+        -column 0 \
+        -row 0 \
+        -columnspan 2 \
+        -rowspan 1 \
+        -sticky nwes
+    grid rowconfigure $base.f $base.f.a \
+        -weight 1
+    grid columnconfigure $base.f $base.f.a \
+        -weight 1
     
     grid $base.f.a.f1
     grid $base.f.a.f1.testlabel
     grid $base.f.a.f2
     grid $base.f.a.f2.testlabel
     
-    grid $base.f.btn1 -column 0 -row 3 -sticky s
-    grid $base.f.btn2 -column 1 -row 3 -sticky s
+    grid $base.f.btn1 \
+        -column 0 \
+        -row 3 \
+        -sticky s
+    grid $base.f.btn2 \
+        -column 1 \
+        -row 3 \
+        -sticky s
 }
 
 proc gui::CancelBtnPressed {} {
