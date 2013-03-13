@@ -2,45 +2,49 @@ package require Tk
 
 # ******** GUI FUNCTIONS ********
 
-proc guiCreate {} {
-    wm title . "File Action"
-    raise .
-    bind . <Key-F1> [list console show]
-    bind . <Key-Escape> guiCancelBtnPressed
-    # grid propagate . 0
-    . configure -height 500
-    . configure -width 400
-    
+proc guiCreate {root} {
+    set base [expr {($root eq ".") ? "" : $root}]
+
+    if {$root eq "."} {
+        wm title . "File Action"
+        raise .
+        bind . <Key-F1> [list console show]
+        bind . <Key-Escape> guiCancelBtnPressed
+        # grid propagate . 0
+        . configure -height 500
+        . configure -width 400
+    }
+
     # widgets
-    ttk::frame .f
+    frame $base.f
     
-    ttk::frame .f.a -padding 2
+    frame $base.f.a
     
-    ttk::frame .f.a.f1 -borderwidth 3 -relief solid
-    ttk::label .f.a.f1.testlabel -text "TEST1"
+    frame $base.f.a.f1 -borderwidth 3 -relief solid
+    label $base.f.a.f1.testlabel -text "TEST1"
     
-    ttk::frame .f.a.f2 -borderwidth 3 -relief solid
-    ttk::label .f.a.f2.testlabel -text "TEST2"
+    frame $base.f.a.f2 -borderwidth 3 -relief solid
+    label $base.f.a.f2.testlabel -text "TEST2"
     
-    ttk::button .f.btn1 -text OK
-    ttk::button .f.btn2 -text Cancel -command guiCancelBtnPressed
+    button $base.f.btn1 -text OK
+    button $base.f.btn2 -text Cancel -command guiCancelBtnPressed
     
     # layout
-    grid .f -column 0 -row 0 -sticky nwes
-    grid rowconfigure . .f -weight 1
-    grid columnconfigure . .f -weight 1
+    grid $base.f -column 0 -row 0 -sticky nwes
+    grid rowconfigure $root $base.f -weight 1
+    grid columnconfigure $root $base.f -weight 1
     
-    grid .f.a -column 0 -row 0 -columnspan 2 -rowspan 1 -sticky nwes
-    grid rowconfigure .f .f.a -weight 1
-    grid columnconfigure .f .f.a -weight 1
+    grid $base.f.a -column 0 -row 0 -columnspan 2 -rowspan 1 -sticky nwes
+    grid rowconfigure $base.f $base.f.a -weight 1
+    grid columnconfigure $base.f $base.f.a -weight 1
     
-    grid .f.a.f1
-    grid .f.a.f1.testlabel
-    grid .f.a.f2
-    grid .f.a.f2.testlabel
+    grid $base.f.a.f1
+    grid $base.f.a.f1.testlabel
+    grid $base.f.a.f2
+    grid $base.f.a.f2.testlabel
     
-    grid .f.btn1 -column 0 -row 3 -sticky s
-    grid .f.btn2 -column 1 -row 3 -sticky s
+    grid $base.f.btn1 -column 0 -row 3 -sticky s
+    grid $base.f.btn2 -column 1 -row 3 -sticky s
 }
 
 proc guiCancelBtnPressed {} {
@@ -128,4 +132,4 @@ proc collectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
 # entry point
 collectCommandLineArguments actDir inactDir actCaret inactCaret \
                 actSel inactSel
-guiCreate
+guiCreate .
