@@ -8,11 +8,9 @@ proc gui::Create {root} {
     if {$root eq "."} {
         wm title . "File Action"
         raise .
+        bind . ? [list console show]
         bind . <Key-F1> [list console show]
         bind . <Key-Escape> [namespace code [list CancelBtnPressed]]
-        # grid propagate . 0
-        . configure -height 500
-        . configure -width 400
     }
 
     # widgets
