@@ -1,15 +1,15 @@
 package require Tk
 
 # ******** GUI FUNCTIONS ********
-
-proc guiCreate {root} {
+namespace eval gui {}
+proc gui::Create {root} {
     set base [expr {($root eq ".") ? "" : $root}]
 
     if {$root eq "."} {
         wm title . "File Action"
         raise .
         bind . <Key-F1> [list console show]
-        bind . <Key-Escape> guiCancelBtnPressed
+        bind . <Key-Escape> [namespace code [list CancelBtnPressed]]
         # grid propagate . 0
         . configure -height 500
         . configure -width 400
@@ -27,7 +27,7 @@ proc guiCreate {root} {
     label $base.f.a.f2.testlabel -text "TEST2"
     
     button $base.f.btn1 -text OK
-    button $base.f.btn2 -text Cancel -command guiCancelBtnPressed
+    button $base.f.btn2 -text Cancel -command [namespace code [list CancelBtnPressed]]
     
     # layout
     grid $base.f -column 0 -row 0 -sticky nwes
@@ -47,7 +47,7 @@ proc guiCreate {root} {
     grid $base.f.btn2 -column 1 -row 3 -sticky s
 }
 
-proc guiCancelBtnPressed {} {
+proc gui::CancelBtnPressed {} {
     exit
 }
 
@@ -132,4 +132,4 @@ proc collectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
 # entry point
 collectCommandLineArguments actDir inactDir actCaret inactCaret \
                 actSel inactSel
-guiCreate .
+gui::Create .
