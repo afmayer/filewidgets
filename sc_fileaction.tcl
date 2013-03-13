@@ -156,4 +156,12 @@ proc collectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
 # entry point
 collectCommandLineArguments actDir inactDir actCaret inactCaret \
                 actSel inactSel
+
+# source all .tcl files in the "widgets" subdirectory
+foreach sourcefile [glob -directory [file join [file dirname [info script]] widgets] -nocomplain -tails *.tcl] {
+    set path [file join [file dirname [info script]] widgets $sourcefile]
+    namespace eval $sourcefile {
+        source $path
+    }
+}
 gui::Create .
