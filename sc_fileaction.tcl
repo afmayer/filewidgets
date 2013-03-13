@@ -3,7 +3,7 @@ package require Tk
 # ******** GUI FUNCTIONS ********
 namespace eval gui {}
 proc gui::Create {root} {
-    set base [expr {($root eq ".") ? "" : $root}]
+    variable base [expr {($root eq ".") ? "" : $root}]
 
     if {$root eq "."} {
         wm title . "File Action"
