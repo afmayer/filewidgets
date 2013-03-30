@@ -3,81 +3,170 @@ package require Tk
 # ******** GUI FUNCTIONS ********
 namespace eval gui {}
 proc gui::Create {root} {
+    global tcl_platform
     variable base [expr {($root eq ".") ? "" : $root}]
+    variable fontSmall
+    variable fontMedium
+    variable fontLarge
+    variable widgetWidth 500
 
-    if {$root eq "."} {
-        wm title . "File Action"
-        raise .
-        bind . ? [list console show]
-        bind . <Key-F1> [list console show]
-        bind . <Key-Escape> [namespace code [list CancelBtnPressed]]
+    # choose fonts dependent on platform
+    if {$tcl_platform(platform) eq "windows"} {
+        set fontSmall "Calibri 8"
+        set fontMedium "Calibri 12"
+        set fontLarge "Calibri 16"
+    } else {
+        set fontSmall "Helvetica 8"
+        set fontMedium "Helvetica 12"
+        set fontLarge "Helvetica 16"
     }
 
+    if {$root eq "."} {
+        wm title . "File Widgets"
+        image create photo mainiconimage -width 16 -height 16
+        mainiconimage put #33CC33 -to  4 4 12 6
+        mainiconimage put #3333CC -to  4 7 12 9
+        mainiconimage put #CC3333 -to  4 10 12 12
+        wm iconphoto . -default mainiconimage
+        wm resizable . 0 0
+        raise .
+        bind . <Key-F1> [list console show]
+        bind . <Key-Escape> [namespace code [list EscapeKeyPressed]]
+    }
+
+    # images
+    image create photo configbtnimage -data {
+        R0lGODlhIAAgAOZgACAgIFNTU1dXVxsbG29vb1xcXB4eHh0dHSEhIfT09KCgoGBgYDMzM5ubm2xs
+        bBwcHEtLS09PT3h4ePDw8Orq6vLy8nZ2drKyspeXl2FhYdPT0/z8/GRkZKenp5aWlvPz8zQ0NPv7
+        +/r6+s7OzszMzLa2tp6enmJiYnl5eUZGRmpqaklJSZGRkaGhoaioqNTU1PHx8XV1dV1dXR8fH5iY
+        mEJCQqOjo2hoaMbGxkFBQYODg2ZmZiIiItnZ2ZqamoGBgenp6dXV1Y2NjWdnZ9fX1+Hh4VRUVOPj
+        439/f0xMTCcnJ3d3d4aGhkpKSubm5sHBwS4uLuzs7DAwMNLS0rq6urGxsb+/v1BQUBoaGrOzs9vb
+        2y8vL4SEhENDQ6ysrG1tbf///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5
+        BAEAAGAALAAAAAAgACAAAAflgGCCg4SFhoeIiYqLjI2Oj5CRkpOKLxZMGEWUhyMEnlwim4UTFxgO
+        Dlmihz43Dk6bVjtfhBQcHFSbOAsLCYNTCxlAm0QFBR0bYBMWBQSiCUMCAjE0J9ECNqIfHkYB3d4B
+        LaoaBBIlHVcR6SaqhBdJEPAN7IMuIAz3QvOCCjwI/j8kdAh4okoBAgAIEwIgEEWUghkGIq5IERGK
+        BlEqDmwJAmZDgwMHWIjKcQAJoRoHlmzq8eCBF0IFHmTYVEHKgC4hBsGg0GtTlQEDZDTQog9MAaAD
+        JBQ90kQJFhRFB1XoGbWqVUiBAAA7}
+
     # widgets
+    frame $base.tf
+    entry $base.tf.searchbox \
+        -font $fontMedium
+    button $base.tf.configbtn \
+        -image configbtnimage \
+        -relief flat \
+        -overrelief solid \
+        -borderwidth 1
+
     frame $base.f
-    
-    frame $base.f.a
-    
-    frame $base.f.a.f1 \
-        -borderwidth 3 \
-        -relief solid
-    label $base.f.a.f1.testlabel \
-        -text "TEST1"
-    
-    frame $base.f.a.f2 -borderwidth 3 \
-        -relief solid
-    label $base.f.a.f2.testlabel \
-        -text "TEST2"
-    
-    button $base.f.btn1 \
-        -text OK
-    button $base.f.btn2 \
-        -text Cancel \
-        -command [namespace code [list CancelBtnPressed]]
-    
+
     # layout
-    grid $base.f \
+    grid $base.tf \
         -column 0 \
         -row 0 \
+        -sticky e
+    grid $base.tf.searchbox \
+        -column 0 \
+        -row 0 \
+        -padx 2 \
+        -pady 2
+    grid $base.tf.configbtn \
+        -column 1 \
+        -row 0 \
+        -padx 2 \
+        -pady 2
+    grid $base.f \
+        -column 0 \
+        -row 1 \
         -sticky nwes
+
+    # layout resizing
     grid rowconfigure $root $base.f \
         -weight 1
     grid columnconfigure $root $base.f \
         -weight 1
-    
-    grid $base.f.a \
-        -column 0 \
-        -row 0 \
-        -columnspan 2 \
-        -rowspan 1 \
-        -sticky nwes
-    grid rowconfigure $base.f $base.f.a \
-        -weight 1
-    grid columnconfigure $base.f $base.f.a \
-        -weight 1
-    
-    grid $base.f.a.f1
-    grid $base.f.a.f1.testlabel
-    grid $base.f.a.f2
-    grid $base.f.a.f2.testlabel
-    
-    grid $base.f.btn1 \
-        -column 0 \
-        -row 3 \
-        -sticky s
-    grid $base.f.btn2 \
-        -column 1 \
-        -row 3 \
-        -sticky s
+
+    # focus to search box
+    focus .tf.searchbox
+
+    return
 }
 
-proc gui::CancelBtnPressed {} {
+proc gui::DrawEmptyWidgets {listOfHeights} {
+    variable base
+    variable widgetWidth
+
+    if {[info exists base] == 0} {
+        error "GUI does not exist"
+    }
+
+    set index 0
+    set returnedFrameList [list]
+
+    foreach w [winfo children $base.f] {
+        destroy $w
+    }
+
+    foreach height $listOfHeights {
+        frame ${base}.f.f${index} \
+            -borderwidth 1 \
+            -relief solid \
+            -width $widgetWidth \
+            -height $height
+
+        grid ${base}.f.f${index}
+
+        if {$index < [llength $listOfHeights] - 1} {
+            frame ${base}.f.s${index} \
+                -height 5
+            grid ${base}.f.s${index}
+        }
+
+        grid propagate ${base}.f.f${index} 0
+        grid propagate ${base}.f.f${index} 0
+
+        lappend returnedFrameList ${base}.f.f${index}
+        incr index
+    }
+
+    return $returnedFrameList
+}
+
+proc gui::DrawInfoText {text} {
+    variable base
+    variable fontLarge
+    variable widgetWidth
+
+    foreach w [winfo children $base.f] {
+        destroy $w
+    }
+
+    frame $base.f.f0 \
+        -width $widgetWidth \
+        -height 100
+    label $base.f.f0.l \
+        -text $text \
+        -font [list {*}$fontLarge italic]
+    grid $base.f.f0
+    grid $base.f.f0.l \
+        -sticky nwes
+    grid propagate $base.f.f0 0
+    grid rowconfigure $base.f.f0 $base.f.f0.l \
+        -weight 1
+    grid columnconfigure $base.f.f0 $base.f.f0.l \
+        -weight 1
+
+    return
+}
+
+proc gui::EscapeKeyPressed {} {
     exit
 }
 
 # ******** NON-GUI FUNCTIONS ********
 
-proc collectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
+proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
                     pActSelectionList pInactSelectionList} {
     global argv
     upvar 1 $pActDir actDir $pInactDir inactDir $pActSelectionList \
@@ -132,36 +221,102 @@ proc collectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
             set is [list]
             continue
         }
-        
+
         # append value to corresponding list or set value
         if {$argumentState == 1} {
-            set actDir $arg
+            set actDir [file normalize $arg]
         } elseif {$argumentState == 2} {
-            set inactDir $arg
+            set inactDir [file normalize $arg]
         } elseif {$argumentState == 3} {
-            set actCaret $arg
+            set actCaret [file normalize $arg]
         } elseif {$argumentState == 4} {
-            set inactCaret $arg
+            set inactCaret [file normalize $arg]
         } elseif {$argumentState == 5} {
-            lappend as $arg
+            lappend as [file normalize $arg]
         } elseif {$argumentState == 6} {
-            lappend is $arg
+            lappend is [file normalize $arg]
         }
     }
-    
+
     set actSelectionList $as
     set inactSelectionList $is
 }
 
-# entry point
-collectCommandLineArguments actDir inactDir actCaret inactCaret \
+proc FileWidgetsMain {} {
+    global brokenPluginNames pluginNames pluginParams
+    set brokenPluginNames [list]
+    set pluginNames [list]
+    array set pluginParams {}
+
+    CollectCommandLineArguments actDir inactDir actCaret inactCaret \
                 actSel inactSel
 
-# source all .tcl files in the "widgets" subdirectory
-foreach sourcefile [glob -directory [file join [file dirname [info script]] widgets] -nocomplain -tails *.tcl] {
-    set path [file join [file dirname [info script]] widgets $sourcefile]
-    namespace eval $sourcefile {
-        source $path
+    # source all .tcl files in the "widgets" subdirectory
+    foreach sourcefile [glob -directory [file join [file dirname [info script]] widgets] -nocomplain -tails *.tcl] {
+        if [
+            catch {
+                # create a namespace for the plugin and source it from inside that namespace
+                namespace eval $sourcefile {
+                    variable path [file join [file dirname [info script]] widgets [namespace tail [namespace current]]]
+                    source $path
+                }
+
+                # ask for parameter list via FWGetParameters
+                foreach {attribute value} [${sourcefile}::FWGetParameters] {
+                    array set pluginParams [list "$sourcefile/$attribute" $value]
+                }
+            }
+        ] {
+            # error in plugin
+            namespace delete $sourcefile
+            lappend brokenPluginNames $sourcefile
+        } else {
+            # plugin seems OK
+            lappend pluginNames $sourcefile
+        }
+    }
+
+    # get widget height list from each plugin
+    set emptyWidgetHeightsPerPlugin [list]
+    set emptyWidgetHeights [list]
+    foreach plugin $pluginNames {
+        catch {
+            # announce selected files
+            ${plugin}::FWSetFiles $actDir $inactDir $actCaret $inactCaret \
+                $actSel $inactSel
+        }
+        set widgetHeightList [list]
+        catch {
+            set pluginWidgetHeightList [list $plugin]
+            set widgetHeightList [${plugin}::FWGetWidgetHeightList]
+        }
+        foreach widgetHeight $widgetHeightList {
+            lappend emptyWidgetHeights $widgetHeight
+            lappend pluginWidgetHeightList $widgetHeight
+        }
+        if {[llength $widgetHeightList] != 0} {
+            lappend emptyWidgetHeightsPerPlugin $pluginWidgetHeightList
+        }
+    }
+
+    # create the GUI
+    gui::Create .
+    if {[llength $emptyWidgetHeights] != 0} {
+        gui::DrawEmptyWidgets $emptyWidgetHeights
+    } else {
+        gui::DrawInfoText "no active widgets"
+        return
+    }
+
+    # announce created widget frames to plugins
+    foreach listOfPluginNameAndWidgetHeights $emptyWidgetHeightsPerPlugin {
+        set pluginName [lindex $listOfPluginNameAndWidgetHeights 0]
+        set widgetHeightList [lrange $listOfPluginNameAndWidgetHeights 1 end]
+        catch {
+            ${pluginName}::FWAnnounceWidgetFrames $widgetHeightList
+        }
     }
 }
-gui::Create .
+
+# entry point
+FileWidgetsMain
