@@ -311,7 +311,6 @@ proc FileWidgetsMain {} {
 
     # announce created widget frames to plugins
     set lowRange 0
-    tk_messageBox -title {$widgetsPerPlugin} -message $widgetsPerPlugin
     foreach {pluginName numOfWidgets} $widgetsPerPlugin {
         set highRange [expr {$lowRange + $numOfWidgets - 1}]
         set widgetHeightList [lrange $createdWidgetFrames $lowRange $highRange]
