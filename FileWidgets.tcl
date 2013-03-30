@@ -280,7 +280,7 @@ proc FileWidgetsMain {} {
     }
 
     # get widget height list from each plugin
-    set emptyWidgetHeightsPerPlugin [list]
+    set widgetsPerPlugin [list]
     set emptyWidgetHeights [list]
     foreach plugin $pluginNames {
         catch {
@@ -290,30 +290,32 @@ proc FileWidgetsMain {} {
         }
         set widgetHeightList [list]
         catch {
-            set pluginWidgetHeightList [list $plugin]
             set widgetHeightList [${plugin}::FWGetWidgetHeightList]
+        }
+        if {[llength $widgetHeightList] != 0} {
+            lappend widgetsPerPlugin $plugin
+            lappend widgetsPerPlugin [llength $widgetHeightList]
         }
         foreach widgetHeight $widgetHeightList {
             lappend emptyWidgetHeights $widgetHeight
-            lappend pluginWidgetHeightList $widgetHeight
-        }
-        if {[llength $widgetHeightList] != 0} {
-            lappend emptyWidgetHeightsPerPlugin $pluginWidgetHeightList
         }
     }
 
     # draw empty widgets
     if {[llength $emptyWidgetHeights] != 0} {
-        gui::DrawEmptyWidgets $emptyWidgetHeights
+        set createdWidgetFrames [gui::DrawEmptyWidgets $emptyWidgetHeights]
     } else {
         gui::DrawInfoText "no active widgets"
         return
     }
 
     # announce created widget frames to plugins
-    foreach listOfPluginNameAndWidgetHeights $emptyWidgetHeightsPerPlugin {
-        set pluginName [lindex $listOfPluginNameAndWidgetHeights 0]
-        set widgetHeightList [lrange $listOfPluginNameAndWidgetHeights 1 end]
+    set lowRange 0
+    tk_messageBox -title {$widgetsPerPlugin} -message $widgetsPerPlugin
+    foreach {pluginName numOfWidgets} $widgetsPerPlugin {
+        set highRange [expr {$lowRange + $numOfWidgets - 1}]
+        set widgetHeightList [lrange $createdWidgetFrames $lowRange $highRange]
+        set lowRange [expr {$highRange + 1}]
         catch {
             ${pluginName}::FWAnnounceWidgetFrames $widgetHeightList
         }
