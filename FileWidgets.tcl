@@ -251,6 +251,9 @@ proc FileWidgetsMain {} {
     CollectCommandLineArguments actDir inactDir actCaret inactCaret \
                 actSel inactSel
 
+    # create the GUI
+    gui::Create .
+
     # source all .tcl files in the "widgets" subdirectory
     foreach sourcefile [glob -directory [file join [file dirname [info script]] widgets] -nocomplain -tails *.tcl] {
         if [
@@ -299,8 +302,7 @@ proc FileWidgetsMain {} {
         }
     }
 
-    # create the GUI
-    gui::Create .
+    # draw empty widgets
     if {[llength $emptyWidgetHeights] != 0} {
         gui::DrawEmptyWidgets $emptyWidgetHeights
     } else {
