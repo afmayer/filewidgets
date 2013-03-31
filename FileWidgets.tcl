@@ -22,20 +22,11 @@ proc gui::Create {root} {
         set fontLarge "Helvetica 16"
     }
 
-    if {$root eq "."} {
-        wm title . "File Widgets"
-        set imageNameArray(mainicon) [image create photo -width 16 -height 16]
-        $imageNameArray(mainicon) put #33CC33 -to  4 4 12 6
-        $imageNameArray(mainicon) put #3333CC -to  4 7 12 9
-        $imageNameArray(mainicon) put #CC3333 -to  4 10 12 12
-        wm iconphoto . -default $imageNameArray(mainicon)
-        wm resizable . 0 0
-        raise .
-        bind . <Key-F1> [list console show]
-        bind . <Key-Escape> [namespace code [list EscapeKeyPressed]]
-    }
-
     # images
+    set imageNameArray(mainicon) [image create photo -width 16 -height 16]
+    $imageNameArray(mainicon) put #33CC33 -to  4 4 12 6
+    $imageNameArray(mainicon) put #3333CC -to  4 7 12 9
+    $imageNameArray(mainicon) put #CC3333 -to  4 10 12 12
     set imageNameArray(space4x1) [image create photo -width 4 -height 1]
     set imageNameArray(configbtn) [image create photo -data {
         R0lGODlhIAAgAOZgACAgIFNTU1dXVxsbG29vb1xcXB4eHh0dHSEhIfT09KCgoGBgYDMzM5ubm2xs
@@ -50,6 +41,15 @@ proc gui::Create {root} {
         LaoaBBIlHVcR6SaqhBdJEPAN7IMuIAz3QvOCCjwI/j8kdAh4okoBAgAIEwIgEEWUghkGIq5IERGK
         BlEqDmwJAmZDgwMHWIjKcQAJoRoHlmzq8eCBF0IFHmTYVEHKgC4hBsGg0GtTlQEDZDTQog9MAaAD
         JBQ90kQJFhRFB1XoGbWqVUiBAAA7}]
+
+    if {$root eq "."} {
+        wm title . "File Widgets"
+        wm iconphoto . -default $imageNameArray(mainicon)
+        wm resizable . 0 0
+        raise .
+        bind . <Key-F1> [list console show]
+        bind . <Key-Escape> [namespace code [list EscapeKeyPressed]]
+    }
 
     # widgets
     frame $base.tf
@@ -97,8 +97,10 @@ proc gui::Create {root} {
     grid columnconfigure $root $base.f \
         -weight 1
 
-    # focus to search box
-    focus .tf.searchbox
+    # search box icon and focus
+    focus $base.tf.searchbox
+    $base.tf.searchbox image create 1.0 -image $imageNameArray(mainicon)
+    $base.tf.searchbox image create 1.1 -image $imageNameArray(space4x1)
 
     return
 }
