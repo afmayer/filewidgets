@@ -56,6 +56,7 @@ proc gui::Create {root} {
     frame $base.tf
     text $base.tf.searchbox \
         -font $fontSmall \
+        -relief solid \
         -insertofftime 600 \
         -insertwidth 1 \
         -width 50 \
@@ -98,10 +99,10 @@ proc gui::Create {root} {
     grid columnconfigure $root $base.f \
         -weight 1
 
-    # search box icon and focus
+    # search box focus and event bindings
     focus $base.tf.searchbox
-    $base.tf.searchbox image create 1.0 -image $imageNameArray(mainicon)
-    $base.tf.searchbox image create 1.1 -image $imageNameArray(space4x1)
+    bind $base.tf.searchbox <<Modified>> \
+        [namespace code [list SearchBoxModified %W]]
 
     return
 }
@@ -177,13 +178,21 @@ proc gui::EscapeKeyPressed {} {
     exit
 }
 
+proc gui::SearchBoxModified {window} {
+    if [$window edit modified] {
+        $window edit modified 0
+    }
+}
+
 proc gui::completionwindow::UpdateContent {window entryList searchStringList} {
     set parentNamespace [namespace parent]
+    $window configure -state normal
     $window configure -height [expr {[llength $entryList]/3}]
     $window delete 1.0 end
-    $window tag configure subtext -foreground #888888
+    $window tag configure subtext -foreground #999999
     $window tag configure selectedline -background #2255FF
     $window tag configure searchhighlight -font [list {*}[$window cget -font] bold]
+    $window tag configure searchhighlight -foreground #66DD55
     set currentLine 0
     foreach {iconname text subtext} $entryList {
         incr currentLine
@@ -208,6 +217,10 @@ proc gui::completionwindow::UpdateContent {window entryList searchStringList} {
     if {$currentLine != 0} {
         $window tag add selectedline 1.0 2.0
     }
+
+    $window configure -state disabled
+
+    return
 }
 
 # ******** NON-GUI FUNCTIONS ********
