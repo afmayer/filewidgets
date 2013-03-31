@@ -12,12 +12,12 @@ proc gui::Create {root} {
 
     # choose fonts dependent on platform
     if {$tcl_platform(platform) eq "windows"} {
-        set fontSmall "Calibri 8"
-        set fontMedium "Calibri 12"
+        set fontSmall "Calibri 12"
+        set fontMedium "Calibri 14"
         set fontLarge "Calibri 16"
     } else {
-        set fontSmall "Helvetica 8"
-        set fontMedium "Helvetica 12"
+        set fontSmall "Helvetica 12"
+        set fontMedium "Helvetica 14"
         set fontLarge "Helvetica 16"
     }
 
@@ -52,7 +52,7 @@ proc gui::Create {root} {
     # widgets
     frame $base.tf
     entry $base.tf.searchbox \
-        -font $fontMedium
+        -font $fontSmall
     button $base.tf.configbtn \
         -image configbtnimage \
         -relief flat \

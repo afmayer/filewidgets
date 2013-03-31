@@ -37,6 +37,9 @@ proc FWAnnounceWidgetFrames {widgetFrames} {
     variable widgetFrame [lindex $widgetFrames 0]
     variable path
 
+    set bgColor #333333
+    $widgetFrame configure -background $bgColor
+
     image create photo gitlogo -data {
         R0lGODlhMAAwAPcAAAQCBFRubExKTES6TPQiFNQ2LOwuHFzGZNxSTHR2dOQmJPw+NDTGTFxydHRa
         XNQ+NNQyLGRqbDzCROwqHOQ2LGRiZNQ6LDy+TOwmHOwuJOQqLGxeXOQuLGxubFxubPQmFNw2LFzO
@@ -62,7 +65,9 @@ proc FWAnnounceWidgetFrames {widgetFrames} {
         NOFUTDZ50ZJJ8sgffRZJ2OCOXsYI0YVM+hjTjfjRh+MGDlJZ5Zr1RXBglvtB6OKJd3no4YMdljhn
         T/ht0GAFdvY4ZpeKVSCAoX5CmOV4/MXJKHl8BQQAOw==}
 
-    label $widgetFrame.logo -image gitlogo
-    grid $widgetFrame.logo -sticky ns
+    label $widgetFrame.logo -image gitlogo -background $bgColor
+    label $widgetFrame.l -font $::gui::fontSmall -text Git -background $bgColor -foreground white
+    grid $widgetFrame.logo -row 0 -column 0 -sticky ns
+    grid $widgetFrame.l -row 0 -column 1 -sticky n
     grid rowconfigure $widgetFrame $widgetFrame.logo -weight 1
 }
