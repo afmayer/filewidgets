@@ -2,6 +2,7 @@ package require Tk
 
 # ******** GUI FUNCTIONS ********
 namespace eval gui {}
+namespace eval gui::completionwindow {}
 proc gui::Create {root} {
     global tcl_platform
     variable base [expr {($root eq ".") ? "" : $root}]
@@ -174,6 +175,39 @@ proc gui::DrawInfoText {text} {
 
 proc gui::EscapeKeyPressed {} {
     exit
+}
+
+proc gui::completionwindow::UpdateContent {window entryList searchStringList} {
+    set parentNamespace [namespace parent]
+    $window configure -height [expr {[llength $entryList]/3}]
+    $window delete 1.0 end
+    $window tag configure subtext -foreground #888888
+    $window tag configure selectedline -background #2255FF
+    $window tag configure searchhighlight -font [list {*}[$window cget -font] bold]
+    set currentLine 0
+    foreach {iconname text subtext} $entryList {
+        incr currentLine
+        $window image create end -image $iconname
+        $window image create end -image [set ${parentNamespace}::imageNameArray(space4x1)]
+        $window insert end $text
+        if {$subtext ne ""} {
+            $window insert end " - $subtext"
+            $window tag add subtext \
+                ${currentLine}.[expr {[string length $text] + 2}] \
+                ${currentLine}.end
+        }
+        $window insert end \n
+    }
+    foreach searchString $searchStringList {
+        set stringLength [string length $searchString]
+        foreach pos [$window search -all -nocase $searchString 1.0 end] {
+            $window tag add searchhighlight $pos "$pos+${stringLength}c"
+        }
+    }
+
+    if {$currentLine != 0} {
+        $window tag add selectedline 1.0 2.0
+    }
 }
 
 # ******** NON-GUI FUNCTIONS ********
