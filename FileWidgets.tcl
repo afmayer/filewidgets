@@ -36,7 +36,8 @@ proc gui::Create {root} {
     }
 
     # images
-    set imageNameArray(configbtn) [image create photo configbtnimage -data {
+    set imageNameArray(space4x1) [image create photo -width 4 -height 1]
+    set imageNameArray(configbtn) [image create photo -data {
         R0lGODlhIAAgAOZgACAgIFNTU1dXVxsbG29vb1xcXB4eHh0dHSEhIfT09KCgoGBgYDMzM5ubm2xs
         bBwcHEtLS09PT3h4ePDw8Orq6vLy8nZ2drKyspeXl2FhYdPT0/z8/GRkZKenp5aWlvPz8zQ0NPv7
         +/r6+s7OzszMzLa2tp6enmJiYnl5eUZGRmpqaklJSZGRkaGhoaioqNTU1PHx8XV1dV1dXR8fH5iY
