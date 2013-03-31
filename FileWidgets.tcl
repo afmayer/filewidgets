@@ -52,7 +52,10 @@ proc gui::Create {root} {
     # widgets
     frame $base.tf
     entry $base.tf.searchbox \
-        -font $fontSmall
+        -font $fontSmall \
+        -insertofftime 600 \
+        -insertwidth 1 \
+        -width 25
     button $base.tf.configbtn \
         -image configbtnimage \
         -relief flat \
