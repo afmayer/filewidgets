@@ -68,7 +68,7 @@ proc gui::Create {root} {
     grid $base.tf \
         -column 0 \
         -row 0 \
-        -sticky e
+        -sticky we
     grid $base.tf.searchbox \
         -column 0 \
         -row 0 \
@@ -78,13 +78,16 @@ proc gui::Create {root} {
         -column 1 \
         -row 0 \
         -padx 2 \
-        -pady 2
+        -pady 2 \
+        -sticky e
     grid $base.f \
         -column 0 \
         -row 1 \
         -sticky nwes
 
     # layout resizing
+    grid columnconfigure $base.tf $base.tf.configbtn \
+        -weight 1
     grid rowconfigure $root $base.f \
         -weight 1
     grid columnconfigure $root $base.f \
