@@ -99,10 +99,18 @@ proc gui::Create {root} {
     grid columnconfigure $root $base.f \
         -weight 1
 
+    # completion window for search box
+    text $base.comp \
+        -font $fontSmall \
+        -relief solid \
+        -width 50 \
+        -height 1 \
+        -cursor ""
+
     # search box focus and event bindings
     focus $base.tf.searchbox
     bind $base.tf.searchbox <<Modified>> \
-        [namespace code [list SearchBoxModified %W .t]]
+        [namespace code [list SearchBoxModified %W $base.comp]]
 
     return
 }
