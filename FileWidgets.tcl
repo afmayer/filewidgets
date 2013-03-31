@@ -102,7 +102,7 @@ proc gui::Create {root} {
     # search box focus and event bindings
     focus $base.tf.searchbox
     bind $base.tf.searchbox <<Modified>> \
-        [namespace code [list SearchBoxModified %W]]
+        [namespace code [list SearchBoxModified %W .t]]
 
     return
 }
@@ -178,23 +178,33 @@ proc gui::EscapeKeyPressed {} {
     exit
 }
 
-proc gui::SearchBoxModified {window} {
+proc gui::SearchBoxModified {window completionWindow} {
     if [$window edit modified] {
+        set parentNamespace [namespace parent]
+        if {$parentNamespace eq "::"} {
+            set parentNamespace ""
+        }
+        set searchTermList [split [$window get 1.0 1.end] " "]
+        set searchSuggestionList [${parentNamespace}::GetSearchSuggestions $searchTermList]
+        gui::completionwindow::UpdateContent $completionWindow $searchSuggestionList $searchTermList
         $window edit modified 0
     }
 }
 
-proc gui::completionwindow::UpdateContent {window entryList searchStringList} {
+proc gui::completionwindow::UpdateContent {window suggestionList searchStringList} {
     set parentNamespace [namespace parent]
+    if {$parentNamespace eq "::"} {
+        set parentNamespace ""
+    }
     $window configure -state normal
-    $window configure -height [expr {[llength $entryList]/3}]
+    $window configure -height [expr {[llength $suggestionList]/3}]
     $window delete 1.0 end
     $window tag configure subtext -foreground #999999
     $window tag configure selectedline -background #2255FF
     $window tag configure searchhighlight -font [list {*}[$window cget -font] bold]
     $window tag configure searchhighlight -foreground #66DD55
     set currentLine 0
-    foreach {iconname text subtext} $entryList {
+    foreach {iconname text subtext} $suggestionList {
         incr currentLine
         $window image create end -image $iconname
         $window image create end -image [set ${parentNamespace}::imageNameArray(space4x1)]
@@ -209,8 +219,10 @@ proc gui::completionwindow::UpdateContent {window entryList searchStringList} {
     }
     foreach searchString $searchStringList {
         set stringLength [string length $searchString]
-        foreach pos [$window search -all -nocase $searchString 1.0 end] {
-            $window tag add searchhighlight $pos "$pos+${stringLength}c"
+        if {$stringLength != 0} {
+            foreach pos [$window search -all -nocase $searchString 1.0 end] {
+                $window tag add searchhighlight $pos "$pos+${stringLength}c"
+            }
         }
     }
 
@@ -299,6 +311,9 @@ proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
 
     set actSelectionList $as
     set inactSelectionList $is
+}
+
+proc GetSearchSuggestions {searchTermList} {
 }
 
 proc FileWidgetsMain {} {
