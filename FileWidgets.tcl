@@ -5,6 +5,7 @@ namespace eval gui {}
 proc gui::Create {root} {
     global tcl_platform
     variable base [expr {($root eq ".") ? "" : $root}]
+    variable imageNameArray
     variable fontSmall
     variable fontMedium
     variable fontLarge
@@ -23,11 +24,11 @@ proc gui::Create {root} {
 
     if {$root eq "."} {
         wm title . "File Widgets"
-        image create photo mainiconimage -width 16 -height 16
-        mainiconimage put #33CC33 -to  4 4 12 6
-        mainiconimage put #3333CC -to  4 7 12 9
-        mainiconimage put #CC3333 -to  4 10 12 12
-        wm iconphoto . -default mainiconimage
+        set imageNameArray(mainicon) [image create photo -width 16 -height 16]
+        $imageNameArray(mainicon) put #33CC33 -to  4 4 12 6
+        $imageNameArray(mainicon) put #3333CC -to  4 7 12 9
+        $imageNameArray(mainicon) put #CC3333 -to  4 10 12 12
+        wm iconphoto . -default $imageNameArray(mainicon)
         wm resizable . 0 0
         raise .
         bind . <Key-F1> [list console show]
@@ -35,7 +36,7 @@ proc gui::Create {root} {
     }
 
     # images
-    image create photo configbtnimage -data {
+    set imageNameArray(configbtn) [image create photo configbtnimage -data {
         R0lGODlhIAAgAOZgACAgIFNTU1dXVxsbG29vb1xcXB4eHh0dHSEhIfT09KCgoGBgYDMzM5ubm2xs
         bBwcHEtLS09PT3h4ePDw8Orq6vLy8nZ2drKyspeXl2FhYdPT0/z8/GRkZKenp5aWlvPz8zQ0NPv7
         +/r6+s7OzszMzLa2tp6enmJiYnl5eUZGRmpqaklJSZGRkaGhoaioqNTU1PHx8XV1dV1dXR8fH5iY
@@ -47,7 +48,7 @@ proc gui::Create {root} {
         Dlmihz43Dk6bVjtfhBQcHFSbOAsLCYNTCxlAm0QFBR0bYBMWBQSiCUMCAjE0J9ECNqIfHkYB3d4B
         LaoaBBIlHVcR6SaqhBdJEPAN7IMuIAz3QvOCCjwI/j8kdAh4okoBAgAIEwIgEEWUghkGIq5IERGK
         BlEqDmwJAmZDgwMHWIjKcQAJoRoHlmzq8eCBF0IFHmTYVEHKgC4hBsGg0GtTlQEDZDTQog9MAaAD
-        JBQ90kQJFhRFB1XoGbWqVUiBAAA7}
+        JBQ90kQJFhRFB1XoGbWqVUiBAAA7}]
 
     # widgets
     frame $base.tf
@@ -58,7 +59,7 @@ proc gui::Create {root} {
         -width 50 \
         -height 1
     button $base.tf.configbtn \
-        -image configbtnimage \
+        -image $imageNameArray(configbtn) \
         -relief flat \
         -overrelief solid \
         -borderwidth 1
