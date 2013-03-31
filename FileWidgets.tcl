@@ -55,7 +55,7 @@ proc gui::Create {root} {
         -font $fontSmall \
         -insertofftime 600 \
         -insertwidth 1 \
-        -width 25
+        -width 50
     button $base.tf.configbtn \
         -image configbtnimage \
         -relief flat \
@@ -89,7 +89,8 @@ proc gui::Create {root} {
     grid columnconfigure $base.tf $base.tf.configbtn \
         -weight 1
     grid rowconfigure $root $base.f \
-        -weight 1
+        -weight 1 \
+        -minsize 200
     grid columnconfigure $root $base.f \
         -weight 1
 
