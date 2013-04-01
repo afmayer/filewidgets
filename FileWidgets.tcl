@@ -29,6 +29,7 @@ proc gui::Create {root} {
     $imageNameArray(mainicon) put #3333CC -to  4 7 12 9
     $imageNameArray(mainicon) put #CC3333 -to  4 10 12 12
     set imageNameArray(space4x1) [image create photo -width 4 -height 1]
+    set imageNameArray(blank16x16) [image create photo -width 16 -height 16]
     set imageNameArray(configbtn) [image create photo -data {
         R0lGODlhIAAgAOZgACAgIFNTU1dXVxsbG29vb1xcXB4eHh0dHSEhIfT09KCgoGBgYDMzM5ubm2xs
         bBwcHEtLS09PT3h4ePDw8Orq6vLy8nZ2drKyspeXl2FhYdPT0/z8/GRkZKenp5aWlvPz8zQ0NPv7
@@ -192,7 +193,12 @@ proc gui::SearchBoxModified {window completionWindow} {
         if {$parentNamespace eq "::"} {
             set parentNamespace ""
         }
-        set searchTermList [split [$window get 1.0 1.end] " "]
+        set searchTermList [list]
+        foreach part [split [$window get 1.0 1.end] " "] {
+            if {$part ne ""} {
+                lappend searchTermList $part
+            }
+        }
         set searchSuggestionList [${parentNamespace}::GetSearchSuggestions $searchTermList]
         gui::completionwindow::UpdateContent $completionWindow $searchSuggestionList $searchTermList
         $window edit modified 0
@@ -227,10 +233,8 @@ proc gui::completionwindow::UpdateContent {window suggestionList searchStringLis
     }
     foreach searchString $searchStringList {
         set stringLength [string length $searchString]
-        if {$stringLength != 0} {
-            foreach pos [$window search -all -nocase $searchString 1.0 end] {
-                $window tag add searchhighlight $pos "$pos+${stringLength}c"
-            }
+        foreach pos [$window search -all -nocase $searchString 1.0 end] {
+            $window tag add searchhighlight $pos "$pos+${stringLength}c"
         }
     }
 
