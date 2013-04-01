@@ -43,15 +43,6 @@ proc gui::Create {root} {
         BlEqDmwJAmZDgwMHWIjKcQAJoRoHlmzq8eCBF0IFHmTYVEHKgC4hBsGg0GtTlQEDZDTQog9MAaAD
         JBQ90kQJFhRFB1XoGbWqVUiBAAA7}]
 
-    if {$root eq "."} {
-        wm title . "File Widgets"
-        wm iconphoto . -default $imageNameArray(mainicon)
-        wm resizable . 0 0
-        raise .
-        bind . <Key-F1> [list console show]
-        bind . <Key-Escape> [namespace code [list EscapeKeyPressed]]
-    }
-
     # widgets
     frame $base.tf
     text $base.tf.searchbox \
@@ -129,6 +120,15 @@ proc gui::Create {root} {
     bind $base.sresults <Leave> \
         [namespace code [list SearchResultLeave %W]]
 
+    if {$root eq "."} {
+        wm title . "File Widgets"
+        wm iconphoto . -default $imageNameArray(mainicon)
+        wm resizable . 0 0
+        raise .
+        bind . <Key-F1> [list console show]
+        bind . <Key-Escape> [namespace code [list EscapeKeyPressed %W $base.tf.searchbox]]
+    }
+
     return
 }
 
@@ -199,8 +199,15 @@ proc gui::DrawInfoText {text} {
     return
 }
 
-proc gui::EscapeKeyPressed {} {
-    exit
+proc gui::EscapeKeyPressed {window searchbox} {
+    if {$window eq $searchbox} {
+        if {[$searchbox count -chars 1.0 1.end] == 0} {
+            exit
+        }
+        $searchbox delete 1.0 end
+    } else {
+        exit
+    }
 }
 
 proc gui::SearchBoxModified {window resultWindow} {
