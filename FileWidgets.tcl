@@ -60,7 +60,8 @@ proc gui::Create {root} {
         -insertofftime 600 \
         -insertwidth 1 \
         -width 50 \
-        -height 1
+        -height 1 \
+        -wrap none
     button $base.tf.configbtn \
         -image $imageNameArray(configbtn) \
         -relief flat \
@@ -106,7 +107,8 @@ proc gui::Create {root} {
         -width 50 \
         -height 1 \
         -cursor "" \
-        -state disabled
+        -state disabled \
+        -wrap none
 
     # search box focus and event bindings
     focus $base.tf.searchbox
@@ -193,6 +195,12 @@ proc gui::SearchBoxModified {window resultWindow} {
         if {$parentNamespace eq "::"} {
             set parentNamespace ""
         }
+
+        # allow only 1 line in search box
+        if {[$window count -lines 1.0 end] > 1} {
+            $window delete 1.end
+        }
+
         set searchTermList [list]
         foreach part [split [$window get 1.0 1.end] " "] {
             if {$part ne ""} {
@@ -211,6 +219,7 @@ proc gui::SearchBoxModified {window resultWindow} {
         }
         $window edit modified 0
     }
+    return
 }
 
 proc gui::UpdateSearchResults {window resultList searchStringList} {
