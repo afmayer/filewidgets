@@ -126,6 +126,8 @@ proc gui::Create {root} {
         [namespace code [list SearchResultMotion %W %x %y]]
     bind $base.sresults <Button-1> \
         [namespace code [list SearchResultClick %W %x %y $base.tf.searchbox]]
+    bind $base.sresults <Leave> \
+        [namespace code [list SearchResultLeave %W]]
 
     return
 }
@@ -289,6 +291,10 @@ proc gui::SearchResultClick {window x y searchbox} {
     catch {place forget $window}
     focus $searchbox
     ExecuteSearchResultLine $clickedLine
+}
+
+proc gui::SearchResultLeave {window} {
+    $window tag remove mouseoverline 1.0 end
 }
 
 proc gui::UpdateSearchResults {window resultList searchStringList} {
