@@ -1,6 +1,6 @@
 variable selectedFiles
 
-proc FWGetParameters {} {
+proc FWInit {} {
     return [list \
         test1 val1 \
         test2 val2 \

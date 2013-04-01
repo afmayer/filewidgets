@@ -2,7 +2,7 @@ variable activeDir
 variable repositoryDir
 variable widgetFrame
 
-proc FWGetParameters {} {
+proc FWInit {} {
     return [list]
 }
 

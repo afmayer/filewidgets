@@ -394,8 +394,8 @@ proc FileWidgetsMain {} {
                     source $path
                 }
 
-                # ask for parameter list via FWGetParameters
-                foreach {attribute value} [${sourcefile}::FWGetParameters] {
+                # ask for parameter list via FWInit
+                foreach {attribute value} [${sourcefile}::FWInit] {
                     array set pluginParams [list "$sourcefile/$attribute" $value]
                 }
             }
