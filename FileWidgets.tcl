@@ -125,7 +125,7 @@ proc gui::Create {root} {
     bind $base.sresults <Motion> \
         [namespace code [list SearchResultMotion %W %x %y]]
     bind $base.sresults <Button-1> \
-        [namespace code [list SearchResultClick %W %x %y]]
+        [namespace code [list SearchResultClick %W %x %y $base.tf.searchbox]]
 
     return
 }
@@ -211,6 +211,8 @@ proc gui::SearchBoxModified {window resultWindow} {
         # allow only 1 line in search box
         if {[$window count -lines 1.0 end] > 1} {
             $window delete 1.end
+            $window edit modified 0
+            return
         }
 
         set searchTermList [list]
@@ -260,13 +262,14 @@ proc gui::SearchBoxEnterPressed {window resultWindow} {
     if {$parentNamespace eq "::"} {
         set parentNamespace ""
     }
+    catch {place forget $resultWindow}
     ${parentNamespace}::ExecuteSearchResultLine $selectedResultLine
 }
 
-proc gui::WindowFocusIn {window searchBox resultWindow} {
+proc gui::WindowFocusIn {window searchbox resultWindow} {
     # hide search result window when focus goes out of search box and results window
     if {$window eq $resultWindow} return
-    set path $searchBox
+    set path $searchbox
     while {1} {
         if {$window eq $path} return
         if {$path eq "."} break
@@ -281,8 +284,10 @@ proc gui::SearchResultMotion {window x y} {
     $window tag lower mouseoverline
 }
 
-proc gui::SearchResultClick {window x y} {
+proc gui::SearchResultClick {window x y searchbox} {
     set clickedLine [expr {[$window count -lines 1.0 @$x,$y] + 1}]
+    catch {place forget $window}
+    focus $searchbox
     ExecuteSearchResultLine $clickedLine
 }
 
@@ -409,7 +414,12 @@ proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
 
 proc GetSearchResults {searchTermList} {
     set returnedList [list]
+    # TODO implement GetSearchResults
     return $returnedList
+}
+
+proc ExecuteSearchResultLine {lineNumber} {
+    # TODO implement ExecuteSearchResultLine
 }
 
 proc FileWidgetsMain {} {
