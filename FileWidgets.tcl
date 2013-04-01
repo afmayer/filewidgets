@@ -106,7 +106,8 @@ proc gui::Create {root} {
         -relief solid \
         -width 50 \
         -height 1 \
-        -cursor ""
+        -cursor "" \
+        -state disabled
 
     # search box focus and event bindings
     focus $base.tf.searchbox
@@ -200,7 +201,15 @@ proc gui::SearchBoxModified {window completionWindow} {
             }
         }
         set searchSuggestionList [${parentNamespace}::GetSearchSuggestions $searchTermList]
-        gui::completionwindow::UpdateContent $completionWindow $searchSuggestionList $searchTermList
+        if {[llength $searchSuggestionList] != 0} {
+            place $completionWindow \
+                -x [winfo x $window] \
+                -y [expr {[winfo y $window] + [winfo height $window]} + 1]
+            gui::completionwindow::UpdateContent $completionWindow \
+                $searchSuggestionList $searchTermList
+        } else {
+            catch {place forget $completionWindow}
+        }
         $window edit modified 0
     }
 }
