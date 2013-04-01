@@ -238,7 +238,7 @@ proc gui::SearchBoxUpKeyPressed {window resultWindow} {
 
 proc gui::SearchBoxDownKeyPressed {window resultWindow} {
     variable selectedResultLine
-    if {$selectedResultLine == [$resultWindow count -lines 1.0 end] - 1} {
+    if {$selectedResultLine >= [$resultWindow count -lines 1.0 end]} {
         return
     }
     $resultWindow tag remove selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
@@ -270,6 +270,7 @@ proc gui::UpdateSearchResults {window resultList searchStringList} {
         }
         $window insert end \n
     }
+    $window delete ${currentLine}.end
     foreach searchString $searchStringList {
         set stringLength [string length $searchString]
         foreach pos [$window search -all -nocase $searchString 1.0 end] {
