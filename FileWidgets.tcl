@@ -110,14 +110,22 @@ proc gui::Create {root} {
         -state disabled \
         -wrap none
 
-    # search box focus and event bindings
+    # search box and search result window event bindings
     focus $base.tf.searchbox
     bind $base.tf.searchbox <<Modified>> \
         [namespace code [list SearchBoxModified %W $base.sresults]]
-    bind $base.tf.searchbox <Up> \
+    bind $base.tf.searchbox <Key-Up> \
         [namespace code [list SearchBoxUpKeyPressed %W $base.sresults]]
-    bind $base.tf.searchbox <Down> \
+    bind $base.tf.searchbox <Key-Down> \
         [namespace code [list SearchBoxDownKeyPressed %W $base.sresults]]
+    bind $base.tf.searchbox <Key-Return> \
+        [namespace code [list SearchBoxEnterPressed %W $base.sresults]]
+    bind $root <FocusIn> \
+        [namespace code [list WindowFocusIn %W $base.tf.searchbox $base.sresults]]
+    bind $base.sresults <Motion> \
+        [namespace code [list SearchResultMotion %W %x %y]]
+    bind $base.sresults <Button-1> \
+        [namespace code [list SearchResultClick %W %x %y]]
 
     return
 }
@@ -246,6 +254,38 @@ proc gui::SearchBoxDownKeyPressed {window resultWindow} {
     $resultWindow tag add selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
 }
 
+proc gui::SearchBoxEnterPressed {window resultWindow} {
+    variable selectedResultLine
+    set parentNamespace [namespace parent]
+    if {$parentNamespace eq "::"} {
+        set parentNamespace ""
+    }
+    ${parentNamespace}::ExecuteSearchResultLine $selectedResultLine
+}
+
+proc gui::WindowFocusIn {window searchBox resultWindow} {
+    # hide search result window when focus goes out of search box and results window
+    if {$window eq $resultWindow} return
+    set path $searchBox
+    while {1} {
+        if {$window eq $path} return
+        if {$path eq "."} break
+        set path [winfo parent $path]
+    }
+    catch {place forget $resultWindow}
+}
+
+proc gui::SearchResultMotion {window x y} {
+    $window tag remove mouseoverline 1.0 end
+    $window tag add mouseoverline "@$x,$y linestart" "@$x,$y linestart +1l"
+    $window tag lower mouseoverline
+}
+
+proc gui::SearchResultClick {window x y} {
+    set clickedLine [expr {[$window count -lines 1.0 @$x,$y] + 1}]
+    ExecuteSearchResultLine $clickedLine
+}
+
 proc gui::UpdateSearchResults {window resultList searchStringList} {
     variable imageNameArray
     variable selectedResultLine
@@ -254,6 +294,7 @@ proc gui::UpdateSearchResults {window resultList searchStringList} {
     $window delete 1.0 end
     $window tag configure subtext -foreground #999999
     $window tag configure selectedline -background #2255FF
+    $window tag configure mouseoverline -background #44AAFF
     $window tag configure searchhighlight -font [list {*}[$window cget -font] bold]
     $window tag configure searchhighlight -foreground #66DD55
     set currentLine 0
