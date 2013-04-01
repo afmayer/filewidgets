@@ -2,7 +2,6 @@ package require Tk
 
 # ******** GUI FUNCTIONS ********
 namespace eval gui {}
-namespace eval gui::completionwindow {}
 proc gui::Create {root} {
     global tcl_platform
     variable base [expr {($root eq ".") ? "" : $root}]
@@ -100,8 +99,8 @@ proc gui::Create {root} {
     grid columnconfigure $root $base.f \
         -weight 1
 
-    # completion window for search box
-    text $base.comp \
+    # result window for search box
+    text $base.sresults \
         -font $fontSmall \
         -relief solid \
         -width 50 \
@@ -112,7 +111,7 @@ proc gui::Create {root} {
     # search box focus and event bindings
     focus $base.tf.searchbox
     bind $base.tf.searchbox <<Modified>> \
-        [namespace code [list SearchBoxModified %W $base.comp]]
+        [namespace code [list SearchBoxModified %W $base.sresults]]
 
     return
 }
@@ -188,7 +187,7 @@ proc gui::EscapeKeyPressed {} {
     exit
 }
 
-proc gui::SearchBoxModified {window completionWindow} {
+proc gui::SearchBoxModified {window resultWindow} {
     if [$window edit modified] {
         set parentNamespace [namespace parent]
         if {$parentNamespace eq "::"} {
@@ -200,37 +199,34 @@ proc gui::SearchBoxModified {window completionWindow} {
                 lappend searchTermList $part
             }
         }
-        set searchSuggestionList [${parentNamespace}::GetSearchSuggestions $searchTermList]
-        if {[llength $searchSuggestionList] != 0} {
-            place $completionWindow \
+        set searchResultList [${parentNamespace}::GetSearchResults $searchTermList]
+        if {[llength $searchResultList] != 0} {
+            place $resultWindow \
                 -x [winfo x $window] \
                 -y [expr {[winfo y $window] + [winfo height $window]} + 1]
-            gui::completionwindow::UpdateContent $completionWindow \
-                $searchSuggestionList $searchTermList
+            gui::UpdateSearchResults $resultWindow \
+                $searchResultList $searchTermList
         } else {
-            catch {place forget $completionWindow}
+            catch {place forget $resultWindow}
         }
         $window edit modified 0
     }
 }
 
-proc gui::completionwindow::UpdateContent {window suggestionList searchStringList} {
-    set parentNamespace [namespace parent]
-    if {$parentNamespace eq "::"} {
-        set parentNamespace ""
-    }
+proc gui::UpdateSearchResults {window resultList searchStringList} {
+    variable imageNameArray
     $window configure -state normal
-    $window configure -height [expr {[llength $suggestionList]/3}]
+    $window configure -height [expr {[llength $resultList]/3}]
     $window delete 1.0 end
     $window tag configure subtext -foreground #999999
     $window tag configure selectedline -background #2255FF
     $window tag configure searchhighlight -font [list {*}[$window cget -font] bold]
     $window tag configure searchhighlight -foreground #66DD55
     set currentLine 0
-    foreach {iconname text subtext} $suggestionList {
+    foreach {iconname text subtext} $resultList {
         incr currentLine
         $window image create end -image $iconname
-        $window image create end -image [set ${parentNamespace}::imageNameArray(space4x1)]
+        $window image create end -image $imageNameArray(space4x1)
         $window insert end $text
         if {$subtext ne ""} {
             $window insert end " - $subtext"
@@ -334,7 +330,9 @@ proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
     set inactSelectionList $is
 }
 
-proc GetSearchSuggestions {searchTermList} {
+proc GetSearchResults {searchTermList} {
+    set returnedList [list]
+    return $returnedList
 }
 
 proc FileWidgetsMain {} {
