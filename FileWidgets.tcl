@@ -102,9 +102,9 @@ proc gui::Create {root} {
 
     # result window for search box
     text $base.sresults \
-        -font $fontSmall \
-        -relief solid \
-        -width 50 \
+        -font [$base.tf.searchbox cget -font] \
+        -relief [$base.tf.searchbox cget -relief] \
+        -width [$base.tf.searchbox cget -width] \
         -height 1 \
         -cursor "" \
         -state disabled \
@@ -114,6 +114,10 @@ proc gui::Create {root} {
     focus $base.tf.searchbox
     bind $base.tf.searchbox <<Modified>> \
         [namespace code [list SearchBoxModified %W $base.sresults]]
+    bind $base.tf.searchbox <Up> \
+        [namespace code [list SearchBoxUpKeyPressed %W $base.sresults]]
+    bind $base.tf.searchbox <Down> \
+        [namespace code [list SearchBoxDownKeyPressed %W $base.sresults]]
 
     return
 }
@@ -222,8 +226,29 @@ proc gui::SearchBoxModified {window resultWindow} {
     return
 }
 
+proc gui::SearchBoxUpKeyPressed {window resultWindow} {
+    variable selectedResultLine
+    if {$selectedResultLine == 1} {
+        return
+    }
+    $resultWindow tag remove selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
+    incr selectedResultLine -1
+    $resultWindow tag add selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
+}
+
+proc gui::SearchBoxDownKeyPressed {window resultWindow} {
+    variable selectedResultLine
+    if {$selectedResultLine == [$resultWindow count -lines 1.0 end] - 1} {
+        return
+    }
+    $resultWindow tag remove selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
+    incr selectedResultLine
+    $resultWindow tag add selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
+}
+
 proc gui::UpdateSearchResults {window resultList searchStringList} {
     variable imageNameArray
+    variable selectedResultLine
     $window configure -state normal
     $window configure -height [expr {[llength $resultList]/3}]
     $window delete 1.0 end
@@ -252,6 +277,7 @@ proc gui::UpdateSearchResults {window resultList searchStringList} {
         }
     }
 
+    set selectedResultLine 1
     if {$currentLine != 0} {
         $window tag add selectedline 1.0 2.0
     }
@@ -345,7 +371,9 @@ proc GetSearchResults {searchTermList} {
 }
 
 proc FileWidgetsMain {} {
-    global brokenPluginNames pluginNames pluginParams
+    variable brokenPluginNames
+    variable pluginNames
+    variable pluginParams
     set brokenPluginNames [list]
     set pluginNames [list]
     array set pluginParams {}
