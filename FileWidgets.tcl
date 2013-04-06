@@ -233,6 +233,7 @@ proc gui::SearchBoxModified {window resultWindow} {
         set searchResultList [${parentNamespace}::GetSearchResults $searchTermList]
         if {[llength $searchResultList] != 0} {
             place $resultWindow \
+                -in [winfo parent $window] \
                 -x [winfo x $window] \
                 -y [expr {[winfo y $window] + [winfo height $window]} + 1]
             gui::UpdateSearchResults $resultWindow \
