@@ -130,6 +130,17 @@ proc filewidgets::gui::Create {root} {
         wm title . "File Widgets"
         wm iconphoto . -default $imageNameArray(mainicon)
         wm resizable . 0 0
+        if {$tcl_platform(platform) eq "windows"} {
+            menu .menu
+            menu .menu.system
+            . configure -menu .menu
+            .menu add cascade -menu .menu.system
+            .menu.system configure -tearoff 0
+            .menu.system add command \
+                -label "Show Console" \
+                -command [list console show] \
+                -accelerator F1
+        }
         raise .
         bind . <Key-F1> [list console show]
         bind . <Key-Escape> [namespace code [list EscapeKeyPressed %W $base.tf.searchbox]]
