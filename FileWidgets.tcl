@@ -379,6 +379,24 @@ proc ProfilingGetData {} {
     return $returnedString
 }
 
+proc ProfilingStartLocal {} {
+    upvar localProfilingTimestamp_ ts
+    if [info exists ts] {
+        error "localProfilingTimestamp_ variable already in use"
+    }
+    set ts [clock microseconds]
+}
+
+proc ProfilingEndLocal {} {
+    upvar localProfilingTimestamp_ ts
+    if {[info exists ts] == 0} {
+        error "no local profiling timestamp"
+    }
+    set returnValue [expr {[clock microseconds] - $ts}]
+    unset ts
+    return $returnValue
+}
+
 proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
                     pActSelectionList pInactSelectionList} {
     global argv
