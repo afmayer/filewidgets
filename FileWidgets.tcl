@@ -1,8 +1,14 @@
 package require Tk
 
+namespace eval filewidgets {
+    variable brokenPluginNames
+    variable pluginNames
+    variable pluginParams
+    variable profilingList
+}
+namespace eval filewidgets::gui {}
 # ******** GUI FUNCTIONS ********
-namespace eval gui {}
-proc gui::Create {root} {
+proc filewidgets::gui::Create {root} {
     global tcl_platform
     variable base [expr {($root eq ".") ? "" : $root}]
     variable imageNameArray
@@ -132,7 +138,7 @@ proc gui::Create {root} {
     return
 }
 
-proc gui::DrawEmptyWidgets {listOfHeights} {
+proc filewidgets::gui::DrawEmptyWidgets {listOfHeights} {
     variable base
     variable widgetWidth
 
@@ -172,7 +178,7 @@ proc gui::DrawEmptyWidgets {listOfHeights} {
     return $returnedFrameList
 }
 
-proc gui::DrawInfoText {text} {
+proc filewidgets::gui::DrawInfoText {text} {
     variable base
     variable fontLarge
     variable widgetWidth
@@ -199,7 +205,7 @@ proc gui::DrawInfoText {text} {
     return
 }
 
-proc gui::EscapeKeyPressed {window searchbox} {
+proc filewidgets::gui::EscapeKeyPressed {window searchbox} {
     if {$window eq $searchbox} {
         if {[$searchbox count -chars 1.0 1.end] == 0} {
             exit
@@ -210,7 +216,7 @@ proc gui::EscapeKeyPressed {window searchbox} {
     }
 }
 
-proc gui::SearchBoxModified {window resultWindow} {
+proc filewidgets::gui::SearchBoxModified {window resultWindow} {
     if [$window edit modified] {
         set parentNamespace [namespace parent]
         if {$parentNamespace eq "::"} {
@@ -236,7 +242,7 @@ proc gui::SearchBoxModified {window resultWindow} {
                 -in [winfo parent $window] \
                 -x [winfo x $window] \
                 -y [expr {[winfo y $window] + [winfo height $window]} + 1]
-            gui::UpdateSearchResults $resultWindow \
+            UpdateSearchResults $resultWindow \
                 $searchResultList $searchTermList
         } else {
             catch {place forget $resultWindow}
@@ -246,7 +252,7 @@ proc gui::SearchBoxModified {window resultWindow} {
     return
 }
 
-proc gui::SearchBoxUpKeyPressed {window resultWindow} {
+proc filewidgets::gui::SearchBoxUpKeyPressed {window resultWindow} {
     variable selectedResultLine
     if {$selectedResultLine == 1} {
         return
@@ -256,7 +262,7 @@ proc gui::SearchBoxUpKeyPressed {window resultWindow} {
     $resultWindow tag add selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
 }
 
-proc gui::SearchBoxDownKeyPressed {window resultWindow} {
+proc filewidgets::gui::SearchBoxDownKeyPressed {window resultWindow} {
     variable selectedResultLine
     if {$selectedResultLine >= [$resultWindow count -lines 1.0 end]} {
         return
@@ -266,7 +272,7 @@ proc gui::SearchBoxDownKeyPressed {window resultWindow} {
     $resultWindow tag add selectedline ${selectedResultLine}.0 ${selectedResultLine}.0+1l
 }
 
-proc gui::SearchBoxEnterPressed {window resultWindow} {
+proc filewidgets::gui::SearchBoxEnterPressed {window resultWindow} {
     variable selectedResultLine
     set parentNamespace [namespace parent]
     if {$parentNamespace eq "::"} {
@@ -276,7 +282,7 @@ proc gui::SearchBoxEnterPressed {window resultWindow} {
     ${parentNamespace}::ExecuteSearchResultLine $selectedResultLine
 }
 
-proc gui::WindowFocusIn {window searchbox resultWindow} {
+proc filewidgets::gui::WindowFocusIn {window searchbox resultWindow} {
     # hide search result window when focus goes out of search box and results window
     if {$window eq $resultWindow} return
     set path $searchbox
@@ -288,24 +294,28 @@ proc gui::WindowFocusIn {window searchbox resultWindow} {
     catch {place forget $resultWindow}
 }
 
-proc gui::SearchResultMotion {window x y} {
+proc filewidgets::gui::SearchResultMotion {window x y} {
     $window tag remove mouseoverline 1.0 end
     $window tag add mouseoverline "@$x,$y linestart" "@$x,$y linestart +1l"
     $window tag lower mouseoverline
 }
 
-proc gui::SearchResultClick {window x y searchbox} {
+proc filewidgets::gui::SearchResultClick {window x y searchbox} {
     set clickedLine [expr {[$window count -lines 1.0 @$x,$y] + 1}]
+    set parentNamespace [namespace parent]
+    if {$parentNamespace eq "::"} {
+        set parentNamespace ""
+    }
     catch {place forget $window}
     focus $searchbox
-    ExecuteSearchResultLine $clickedLine
+    ${parentNamespace}::ExecuteSearchResultLine $clickedLine
 }
 
-proc gui::SearchResultLeave {window} {
+proc filewidgets::gui::SearchResultLeave {window} {
     $window tag remove mouseoverline 1.0 end
 }
 
-proc gui::UpdateSearchResults {window resultList searchStringList} {
+proc filewidgets::gui::UpdateSearchResults {window resultList searchStringList} {
     variable imageNameArray
     variable selectedResultLine
     $window configure -state normal
@@ -350,7 +360,7 @@ proc gui::UpdateSearchResults {window resultList searchStringList} {
 
 # ******** NON-GUI FUNCTIONS ********
 
-proc ProfilingStartMeasure {} {
+proc filewidgets::ProfilingStartMeasure {} {
     variable profilingList
     if {[info exists profilingList] == 0} {
         set profilingList [list]
@@ -358,7 +368,7 @@ proc ProfilingStartMeasure {} {
     set profilingList [lreplace $profilingList end end [clock microseconds]]
 }
 
-proc ProfilingAppendDelta {description} {
+proc filewidgets::ProfilingAppendDelta {description} {
     variable profilingList
     set currentMicroseconds [clock microseconds]
     if {[info exists profilingList]} {
@@ -369,7 +379,7 @@ proc ProfilingAppendDelta {description} {
     }
 }
 
-proc ProfilingGetData {} {
+proc filewidgets::ProfilingGetData {} {
     variable profilingList
     set returnedString ""
     foreach {description delta} $profilingList {
@@ -380,7 +390,7 @@ proc ProfilingGetData {} {
     return $returnedString
 }
 
-proc ProfilingStartLocal {} {
+proc filewidgets::ProfilingStartLocal {} {
     upvar localProfilingTimestamp_ ts
     if [info exists ts] {
         error "localProfilingTimestamp_ variable already in use"
@@ -388,7 +398,7 @@ proc ProfilingStartLocal {} {
     set ts [clock microseconds]
 }
 
-proc ProfilingEndLocal {} {
+proc filewidgets::ProfilingEndLocal {} {
     upvar localProfilingTimestamp_ ts
     if {[info exists ts] == 0} {
         error "no local profiling timestamp"
@@ -398,8 +408,8 @@ proc ProfilingEndLocal {} {
     return $returnValue
 }
 
-proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
-                    pActSelectionList pInactSelectionList} {
+proc filewidgets::CollectCommandLineArguments {pActDir pInactDir pActCaret \
+                    pInactCaret pActSelectionList pInactSelectionList} {
     global argv
     upvar 1 $pActDir actDir $pInactDir inactDir $pActSelectionList \
                     actSelectionList $pInactSelectionList inactSelectionList \
@@ -474,17 +484,17 @@ proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
     set inactSelectionList $is
 }
 
-proc GetSearchResults {searchTermList} {
+proc filewidgets::GetSearchResults {searchTermList} {
     set returnedList [list]
     # TODO implement GetSearchResults
     return $returnedList
 }
 
-proc ExecuteSearchResultLine {lineNumber} {
+proc filewidgets::ExecuteSearchResultLine {lineNumber} {
     # TODO implement ExecuteSearchResultLine
 }
 
-proc FileWidgetsMain {} {
+proc filewidgets::FileWidgetsMain {} {
     variable brokenPluginNames
     variable pluginNames
     variable pluginParams
@@ -542,7 +552,7 @@ proc FileWidgetsMain {} {
         catch {
             set widgetHeightList [${plugin}::FWGetWidgetHeightList]
         }
-        ProfilingAppendDelta "$plugin: ask for widget heights"
+        ProfilingAppendDelta "$plugin: FWGetWidgetHeightList"
         if {[llength $widgetHeightList] != 0} {
             lappend widgetsPerPlugin $plugin
             lappend widgetsPerPlugin [llength $widgetHeightList]
@@ -577,4 +587,4 @@ proc FileWidgetsMain {} {
 }
 
 # entry point
-FileWidgetsMain
+filewidgets::FileWidgetsMain

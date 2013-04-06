@@ -66,7 +66,7 @@ proc FWAnnounceWidgetFrames {widgetFrames} {
         T/ht0GAFdvY4ZpeKVSCAoX5CmOV4/MXJKHl8BQQAOw==}
 
     label $widgetFrame.logo -image gitlogo -text Git -compound top \
-        -background $bgColor -foreground white -font $::gui::fontSmall
+        -background $bgColor -foreground white -font $filewidgets::gui::fontSmall
     grid $widgetFrame.logo -row 0 -column 0 -sticky ns
     grid rowconfigure $widgetFrame $widgetFrame.logo -weight 1
 }
