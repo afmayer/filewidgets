@@ -349,6 +349,36 @@ proc gui::UpdateSearchResults {window resultList searchStringList} {
 
 # ******** NON-GUI FUNCTIONS ********
 
+proc ProfilingStartMeasure {} {
+    variable profilingList
+    if {[info exists profilingList] == 0} {
+        set profilingList [list]
+    }
+    set profilingList [lreplace $profilingList end end [clock microseconds]]
+}
+
+proc ProfilingAppendDelta {description} {
+    variable profilingList
+    set currentMicroseconds [clock microseconds]
+    if {[info exists profilingList]} {
+        # append the delta since the last call to one of
+        # ProfilingStartMeasure or ProfilingAppendDelta
+        set delta [expr {$currentMicroseconds - [lindex $profilingList end]}]
+        set profilingList [lreplace $profilingList end end $description $delta $currentMicroseconds]
+    }
+}
+
+proc ProfilingGetData {} {
+    variable profilingList
+    set returnedString ""
+    foreach {description delta} $profilingList {
+        if {$delta ne ""} {
+            append returnedString [format "%8d \u00B5s: %s\n" $delta $description]
+        }
+    }
+    return $returnedString
+}
+
 proc CollectCommandLineArguments {pActDir pInactDir pActCaret pInactCaret \
                     pActSelectionList pInactSelectionList} {
     global argv
@@ -447,22 +477,27 @@ proc FileWidgetsMain {} {
                 actSel inactSel
 
     # create the GUI
+    ProfilingStartMeasure
     gui::Create .
+    ProfilingAppendDelta "GUI creation"
 
     # source all .tcl files in the "widgets" subdirectory
     foreach sourcefile [glob -directory [file join [file dirname [info script]] widgets] -nocomplain -tails *.tcl] {
         if [
             catch {
                 # create a namespace for the plugin and source it from inside that namespace
+                ProfilingStartMeasure
                 namespace eval $sourcefile {
                     variable path [file join [file dirname [info script]] widgets [namespace tail [namespace current]]]
                     source $path
                 }
+                ProfilingAppendDelta "$sourcefile: source plugin"
 
                 # ask for parameter list via FWInit
                 foreach {attribute value} [${sourcefile}::FWInit] {
                     array set pluginParams [list "$sourcefile/$attribute" $value]
                 }
+                ProfilingAppendDelta "$sourcefile: FWInit"
             }
         ] {
             # error in plugin
@@ -484,9 +519,11 @@ proc FileWidgetsMain {} {
                 $actSel $inactSel
         }
         set widgetHeightList [list]
+        ProfilingStartMeasure
         catch {
             set widgetHeightList [${plugin}::FWGetWidgetHeightList]
         }
+        ProfilingAppendDelta "$plugin: ask for widget heights"
         if {[llength $widgetHeightList] != 0} {
             lappend widgetsPerPlugin $plugin
             lappend widgetsPerPlugin [llength $widgetHeightList]
@@ -498,7 +535,9 @@ proc FileWidgetsMain {} {
 
     # draw empty widgets
     if {[llength $emptyWidgetHeights] != 0} {
+        ProfilingStartMeasure
         set createdWidgetFrames [gui::DrawEmptyWidgets $emptyWidgetHeights]
+        ProfilingAppendDelta "draw empty widgets"
     } else {
         gui::DrawInfoText "no active widgets"
         return
@@ -510,9 +549,11 @@ proc FileWidgetsMain {} {
         set highRange [expr {$lowRange + $numOfWidgets - 1}]
         set widgetHeightList [lrange $createdWidgetFrames $lowRange $highRange]
         set lowRange [expr {$highRange + 1}]
+        ProfilingStartMeasure
         catch {
             ${pluginName}::FWAnnounceWidgetFrames $widgetHeightList
         }
+        ProfilingAppendDelta "$pluginName: FWAnnounceWidgetFrames"
     }
 }
 
