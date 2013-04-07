@@ -146,6 +146,13 @@ proc filewidgets::gui::Create {root} {
         bind . <Key-Escape> [namespace code [list EscapeKeyPressed %W $base.tf.searchbox]]
     }
 
+    # increase console font size
+    catch {
+        for {set i 0} {$i < 5} {incr i} {
+            console eval {event generate .console <<Console_FontSizeIncr>>}
+        }
+    }
+
     return
 }
 
