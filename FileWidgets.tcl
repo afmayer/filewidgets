@@ -6,7 +6,9 @@ namespace eval filewidgets {
     variable pluginParams
     variable profilingList
 }
+
 namespace eval filewidgets::gui {}
+
 # ******** GUI FUNCTIONS ********
 proc filewidgets::gui::Create {root} {
     global tcl_platform
