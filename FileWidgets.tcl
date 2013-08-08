@@ -30,20 +30,22 @@ proc filewidgets::gui::Create {root} {
     global tcl_platform
     variable base [expr {($root eq ".") ? "" : $root}]
     variable imageNameArray
-    variable fontSmall
-    variable fontMedium
-    variable fontLarge
+    variable fontSmall "Helvetica 12"
+    variable fontMedium "Helvetica 14"
+    variable fontLarge "Helvetica 16"
     variable widgetWidth 500
 
-    # choose fonts dependent on platform
+    # try to use different font
     if {$tcl_platform(platform) eq "windows"} {
-        set fontSmall "Calibri 12"
-        set fontMedium "Calibri 14"
-        set fontLarge "Calibri 16"
-    } else {
-        set fontSmall "Helvetica 12"
-        set fontMedium "Helvetica 14"
-        set fontLarge "Helvetica 16"
+        if {[lsearch -exact -nocase [font families] Calibri] != -1} {
+            set fontSmall "Calibri 12"
+            set fontMedium "Calibri 14"
+            set fontLarge "Calibri 16"
+        } elseif {[lsearch -exact -nocase [font families] Verdana] != -1} {
+            set fontSmall "Verdana 12"
+            set fontMedium "Verdana 14"
+            set fontLarge "Verdana 16"
+        }
     }
 
     # images
