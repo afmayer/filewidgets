@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# TODO
+#   always bind <Key-Escape> for search box
+
 package require Tk
 
 namespace eval filewidgets {
@@ -525,6 +528,11 @@ proc filewidgets::CollectCommandLineArguments {pActDir pInactDir pActCaret \
 proc filewidgets::GetSearchResults {searchTermList} {
     set returnedList [list]
     # TODO implement GetSearchResults
+    #foreach searchTerm $searchTermList {
+    #    lappend returnedList $gui::imageNameArray(mainicon)
+    #    lappend returnedList "Oh! I found something with $searchTerm!"
+    #    lappend returnedList "1234 Test"
+    #}
     return $returnedList
 }
 
