@@ -314,13 +314,18 @@ proc filewidgets::gui::SearchBoxDownKeyPressed {window resultWindow} {
 }
 
 proc filewidgets::gui::SearchBoxEnterPressed {window resultWindow} {
+    variable searchResultPluginList
+    variable searchResultCommandStringList
     variable selectedResultLine
     set parentNamespace [namespace parent]
     if {$parentNamespace eq "::"} {
         set parentNamespace ""
     }
     catch {place forget $resultWindow}
-    ${parentNamespace}::ExecuteSearchResultLine $selectedResultLine
+    set searchResultIndex [expr {$selectedResultLine - 1}]
+    ${parentNamespace}::ExecuteSearchResultLine \
+        [lindex $searchResultPluginList $searchResultIndex] \
+        [lindex $searchResultCommandStringList $searchResultIndex]
 }
 
 proc filewidgets::gui::WindowFocusIn {window searchbox resultWindow} {
@@ -342,6 +347,8 @@ proc filewidgets::gui::SearchResultMotion {window x y} {
 }
 
 proc filewidgets::gui::SearchResultClick {window x y searchbox} {
+    variable searchResultPluginList
+    variable searchResultCommandStringList
     set clickedLine [expr {[$window count -lines 1.0 @$x,$y] + 1}]
     set parentNamespace [namespace parent]
     if {$parentNamespace eq "::"} {
@@ -349,7 +356,10 @@ proc filewidgets::gui::SearchResultClick {window x y searchbox} {
     }
     catch {place forget $window}
     focus $searchbox
-    ${parentNamespace}::ExecuteSearchResultLine $clickedLine
+    set searchResultIndex [expr {$clickedLine - 1}]
+    ${parentNamespace}::ExecuteSearchResultLine \
+        [lindex $searchResultPluginList $searchResultIndex] \
+        [lindex $searchResultCommandStringList $searchResultIndex]
 }
 
 proc filewidgets::gui::SearchResultLeave {window} {
@@ -357,10 +367,12 @@ proc filewidgets::gui::SearchResultLeave {window} {
 }
 
 proc filewidgets::gui::UpdateSearchResults {window resultList searchStringList} {
+    variable searchResultPluginList
+    variable searchResultCommandStringList
     variable imageNameArray
     variable selectedResultLine
     $window configure -state normal
-    $window configure -height [expr {[llength $resultList]/3}]
+    $window configure -height [expr {[llength $resultList]/5}]
     $window delete 1.0 end
     $window tag configure subtext -foreground #999999
     $window tag configure selectedline -background #2255FF
@@ -368,8 +380,12 @@ proc filewidgets::gui::UpdateSearchResults {window resultList searchStringList} 
     $window tag configure searchhighlight -font [list {*}[$window cget -font] bold]
     $window tag configure searchhighlight -foreground #66DD55
     set currentLine 0
-    foreach {iconname text subtext} $resultList {
+    set searchResultPluginList [list]
+    set searchResultCommandStringList [list]
+    foreach {plugin cmdstring iconname text subtext} $resultList {
         incr currentLine
+        lappend searchResultPluginList $plugin
+        lappend searchResultCommandStringList $cmdstring
         if {$iconname eq ""} {
             set iconname $imageNameArray(blank16x16)
         }
@@ -535,12 +551,20 @@ proc filewidgets::GetSearchResults {searchTermList} {
         ProfilingStartMeasure
         if {[llength $searchTermList] != 0} {
             catch {
-                lappend searchResultList \
-                    {*}[${plugin}::FWGetDynamicSearchResults $searchTermList]
+                set dynamicResults \
+                    [${plugin}::FWGetDynamicSearchResults $searchTermList]
+                foreach {cmdstring iconname text subtext} $dynamicResults {
+                    lappend searchResultList \
+                        $plugin $cmdstring $iconname $text $subtext
+                }
             }
         }
         catch {
-            lappend searchResultList {*}[${plugin}::FWGetStaticSearchResults]
+            set staticResults [${plugin}::FWGetStaticSearchResults]
+            foreach {cmdstring iconname text subtext} $staticResults {
+                lappend searchResultList \
+                    $plugin $cmdstring $iconname $text $subtext
+            }
         }
         ProfilingAppendDelta \
             "$plugin: get search results for \"$searchTermList\""
@@ -548,8 +572,10 @@ proc filewidgets::GetSearchResults {searchTermList} {
     return $searchResultList
 }
 
-proc filewidgets::ExecuteSearchResultLine {lineNumber} {
-    # TODO implement ExecuteSearchResultLine
+proc filewidgets::ExecuteSearchResultLine {plugin commandString} {
+    catch {
+        ${plugin}::FWExecuteSearchResultLine $commandString
+    }
 }
 
 proc filewidgets::FileWidgetsMain {} {

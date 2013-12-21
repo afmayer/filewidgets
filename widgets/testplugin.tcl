@@ -31,9 +31,16 @@ proc FWGetWidgetHeightList {} {
     return $returnedHeightList
 }
 
+proc FWAnnounceWidgetFrames {widgetFrames} {
+    variable widgetFrame [lindex $widgetFrames 0]
+    label $widgetFrame.l1 -text "testplugin" -font $filewidgets::gui::fontLarge
+    grid $widgetFrame.l1 -row 0 -column 0
+}
+
 proc FWGetDynamicSearchResults {searchTermList} {
     set returnedList [list]
     foreach s $searchTermList {
+        lappend returnedList "test-search-result $s"
         lappend returnedList ""
         lappend returnedList "Oh! I found something with $s!"
         lappend returnedList "testplugin"
@@ -44,4 +51,8 @@ proc FWGetDynamicSearchResults {searchTermList} {
 proc FWGetStaticSearchResults {} {
     set returnedList [list]
     return $returnedList
+}
+
+proc FWExecuteSearchResultLine {commandString} {
+    puts "testplugin FWExecuteSearchResultLine \"$commandString\""
 }
