@@ -40,7 +40,7 @@ proc FWAnnounceWidgetFrames {widgetFrames} {
     set bgColor #333333
     $widgetFrame configure -background $bgColor
 
-    image create photo gitlogo -data {
+    set iconname [image create photo -data {
         R0lGODlhMAAwAPcAAAQCBFRubExKTES6TPQiFNQ2LOwuHFzGZNxSTHR2dOQmJPw+NDTGTFxydHRa
         XNQ+NNQyLGRqbDzCROwqHOQ2LGRiZNQ6LDy+TOwmHOwuJOQqLGxeXOQuLGxubFxubPQmFNw2LFzO
         ZHx6fOwmJPRCNDTKTNwyLGxqbETCTPQqHGRmZNw6LES+TOQyJHReXAUAAKAAALcAACIAAAUAAFD/
@@ -63,9 +63,9 @@ proc FWAnnounceWidgetFrames {widgetFrames} {
         nMCvH/9+FXN18J8KAN5HoH/8EUjgXCrgV8EJBRI4IIL/zSWCfgqeIFCGCSpY4FsenpDAhwcWWF+D
         C06VIH4FPZgiAAqyOBWKMqaH4ocw9qdhUhjWuKGHBN2II0so7mdQBwoSdAKEDc54I0ZIMqlif0M+
         NOFUTDZ50ZJJ8sgffRZJ2OCOXsYI0YVM+hjTjfjRh+MGDlJZ5Zr1RXBglvtB6OKJd3no4YMdljhn
-        T/ht0GAFdvY4ZpeKVSCAoX5CmOV4/MXJKHl8BQQAOw==}
+        T/ht0GAFdvY4ZpeKVSCAoX5CmOV4/MXJKHl8BQQAOw==}]
 
-    label $widgetFrame.logo -image gitlogo -text Git -compound top \
+    label $widgetFrame.logo -image $iconname -text Git -compound top \
         -background $bgColor -foreground white -font $filewidgets::gui::fontSmall
     grid $widgetFrame.logo -row 0 -column 0 -sticky ns
     grid rowconfigure $widgetFrame $widgetFrame.logo -weight 1
