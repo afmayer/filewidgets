@@ -30,3 +30,18 @@ proc FWGetWidgetHeightList {} {
     }
     return $returnedHeightList
 }
+
+proc FWGetDynamicSearchResults {searchTermList} {
+    set returnedList [list]
+    foreach s $searchTermList {
+        lappend returnedList ""
+        lappend returnedList "Oh! I found something with $s!"
+        lappend returnedList "testplugin"
+    }
+    return $returnedList
+}
+
+proc FWGetStaticSearchResults {} {
+    set returnedList [list]
+    return $returnedList
+}

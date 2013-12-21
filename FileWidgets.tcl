@@ -370,6 +370,9 @@ proc filewidgets::gui::UpdateSearchResults {window resultList searchStringList} 
     set currentLine 0
     foreach {iconname text subtext} $resultList {
         incr currentLine
+        if {$iconname eq ""} {
+            set iconname $imageNameArray(blank16x16)
+        }
         $window image create end -image $iconname
         $window image create end -image $imageNameArray(space4x1)
         $window insert end $text
@@ -526,14 +529,23 @@ proc filewidgets::CollectCommandLineArguments {pActDir pInactDir pActCaret \
 }
 
 proc filewidgets::GetSearchResults {searchTermList} {
-    set returnedList [list]
-    # TODO implement GetSearchResults
-    #foreach searchTerm $searchTermList {
-    #    lappend returnedList $gui::imageNameArray(mainicon)
-    #    lappend returnedList "Oh! I found something with $searchTerm!"
-    #    lappend returnedList "1234 Test"
-    #}
-    return $returnedList
+    variable pluginNames
+    set searchResultList [list]
+    foreach plugin $pluginNames {
+        ProfilingStartMeasure
+        if {[llength $searchTermList] != 0} {
+            catch {
+                lappend searchResultList \
+                    {*}[${plugin}::FWGetDynamicSearchResults $searchTermList]
+            }
+        }
+        catch {
+            lappend searchResultList {*}[${plugin}::FWGetStaticSearchResults]
+        }
+        ProfilingAppendDelta \
+            "$plugin: get search results for \"$searchTermList\""
+    }
+    return $searchResultList
 }
 
 proc filewidgets::ExecuteSearchResultLine {lineNumber} {
