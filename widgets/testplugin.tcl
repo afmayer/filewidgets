@@ -37,13 +37,15 @@ proc FWAnnounceWidgetFrames {widgetFrames} {
     grid $widgetFrame.l1 -row 0 -column 0
 }
 
-proc FWGetDynamicSearchResults {searchTermList} {
+proc FWGetDynamicSearchResults {searchTerm} {
     set returnedList [list]
-    foreach s $searchTermList {
-        lappend returnedList "test-search-result $s"
-        lappend returnedList ""
-        lappend returnedList "Oh! I found something with $s!"
-        lappend returnedList "testplugin"
+    foreach s [split $searchTerm " "] {
+        if {$s ne ""} {
+            lappend returnedList "test-search-result $s"
+            lappend returnedList ""
+            lappend returnedList "Oh! I found something with $s!"
+            lappend returnedList "testplugin"
+        }
     }
     return $returnedList
 }

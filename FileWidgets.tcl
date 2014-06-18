@@ -271,13 +271,14 @@ proc filewidgets::gui::SearchBoxModified {window resultWindow} {
             return
         }
 
+        set searchTerm [$window get 1.0 1.end]
         set searchTermList [list]
-        foreach part [split [$window get 1.0 1.end] " "] {
+        foreach part [split $searchTerm " "] {
             if {$part ne ""} {
                 lappend searchTermList $part
             }
         }
-        set searchResultList [${parentNamespace}::GetSearchResults $searchTermList]
+        set searchResultList [${parentNamespace}::GetSearchResults $searchTerm]
         if {[llength $searchResultList] != 0} {
             place $resultWindow \
                 -in [winfo parent $window] \
@@ -544,15 +545,15 @@ proc filewidgets::CollectCommandLineArguments {pActDir pInactDir pActCaret \
     set inactSelectionList $is
 }
 
-proc filewidgets::GetSearchResults {searchTermList} {
+proc filewidgets::GetSearchResults {searchTerm} {
     variable pluginNames
     set searchResultList [list]
     foreach plugin $pluginNames {
         ProfilingStartMeasure
-        if {[llength $searchTermList] != 0} {
+        if {$searchTerm ne ""} {
             catch {
                 set dynamicResults \
-                    [${plugin}::FWGetDynamicSearchResults $searchTermList]
+                    [${plugin}::FWGetDynamicSearchResults $searchTerm]
                 foreach {cmdstring iconname text subtext} $dynamicResults {
                     lappend searchResultList \
                         $plugin $cmdstring $iconname $text $subtext
@@ -567,7 +568,7 @@ proc filewidgets::GetSearchResults {searchTermList} {
             }
         }
         ProfilingAppendDelta \
-            "$plugin: get search results for \"$searchTermList\""
+            "$plugin: get search results for \"$searchTerm\""
     }
     return $searchResultList
 }
