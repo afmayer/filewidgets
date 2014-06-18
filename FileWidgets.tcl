@@ -161,11 +161,11 @@ proc filewidgets::gui::Create {root} {
             .menu.system configure -tearoff 0
             .menu.system add command \
                 -label "Show Console" \
-                -command [list console show] \
+                -command [list catch {console show}] \
                 -accelerator F1
         }
         raise .
-        bind . <Key-F1> [list console show]
+        bind . <Key-F1> [list catch {console show}]
         bind . <Key-Escape> [namespace code [list EscapeKeyPressed %W $base.tf.searchbox]]
     }
 
