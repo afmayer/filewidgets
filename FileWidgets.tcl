@@ -404,7 +404,7 @@ proc filewidgets::gui::UpdateSearchResults {window resultList searchStringList} 
     $window delete ${currentLine}.end
     foreach searchString $searchStringList {
         set stringLength [string length $searchString]
-        foreach pos [$window search -all -nocase $searchString 1.0 end] {
+        foreach pos [$window search -all -nocase -- $searchString 1.0 end] {
             $window tag add searchhighlight $pos "$pos+${stringLength}c"
         }
     }
